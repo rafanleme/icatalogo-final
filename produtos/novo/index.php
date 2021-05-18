@@ -1,7 +1,14 @@
 <?php
 session_start();
 
-echo session_save_path();
+//se o usuário não estiver logado
+if (!isset($_SESSION["usuarioId"])) {
+
+  //redireciona para a página de produtos com mensagem de erro
+  $_SESSION["mensagem"] = "Você precisa fazer login para acessar essa página.";
+
+  header("location: ../index.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">

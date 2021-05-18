@@ -16,6 +16,7 @@
     <div class="content">
         <div style="position: absolute; top: 0; right: 0;">
             <?php
+
             if (isset($_SESSION["erros"])) {
                 echo $_SESSION["erros"][0];
             }
@@ -37,7 +38,7 @@
             ?>
                 <header>
                     <button onclick="javascript:window.location.href ='./novo/'">Novo Produto</button>
-                    <button>Adicionar Categoria</button>
+                    <button onclick="javascript:window.location.href ='../categorias/'">Adicionar Categoria</button>
                 </header>
             <?php
             }
