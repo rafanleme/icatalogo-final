@@ -2,6 +2,21 @@
 session_start();
 ?>
 <link href="/web-backend-b/icatalogo/componentes/header/header.css" rel="stylesheet" />
+<div class="mensagens">
+    <?php
+
+    if (isset($_SESSION["erros"])) {
+        echo $_SESSION["erros"][0];
+    }
+
+    if (isset($_SESSION["mensagem"])) {
+        echo $_SESSION["mensagem"];
+    }
+
+    unset($_SESSION["erros"]);
+    unset($_SESSION["mensagem"]);
+    ?>
+</div>
 <header class="header">
     <figure>
         <img src="/web-backend-b/icatalogo/imgs/logo.png" />
@@ -42,7 +57,7 @@ session_start();
 <script lang="javascript">
     document.querySelector("#menu-admin").addEventListener("click", toggleLogin);
 
-    function logout(){
+    function logout() {
         document.querySelector("#form-logout").submit();
     }
 

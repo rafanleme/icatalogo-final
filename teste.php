@@ -1,10 +1,10 @@
 <?php
 
-    session_start();
+session_start();
 
-    require("./database/conexao.php");
+require("./database/conexao.php");
 
-    var_dump(is_numeric(""));
+var_dump(is_numeric(""));
 
 
-    echo $_SESSION["minhaString"];
+echo $_SESSION["minhaString"];

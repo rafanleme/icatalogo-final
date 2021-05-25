@@ -46,6 +46,32 @@ function validarCampos()
         $erros[] = "O campo desconto deve ser um número";
     }
 
+    //verificar se o campo foto está vindo e se ele é uma imagem
+    if ($_FILES["foto"]["error"] == UPLOAD_ERR_NO_FILE) {
+        $erros[] = "Você precisa enviar uma imagem";
+    } else {
+        //se o arquivo é uma imagem
+        $imagemInfos = getimagesize($_FILES["foto"]["tmp_name"]);
+
+        //se não for uma imagem
+        if (!$imagemInfos) {
+            $erros[] = "O arquivo precisa ser uma imagem";
+        }
+
+        //se a imagem for maior que 2MB
+        if ($_FILES["foto"]["size"] > 1024 * 1024 * 2) {
+            $erros[] = "O arquivo não pode ser maior que 2MB";
+        }
+
+        //se a imagem não for quadrada [[[--DESAFIO--]]]
+        //se a largura e a altura forem iguais, a imagem é quadrada
+        $width = $imagemInfos[0];
+        $height = $imagemInfos[1];
+        if ($width != $height) {
+            $erros[] = "A imagem precisa ser quadrada";
+        }
+    } 
+
     //retorna os erros
     return $erros;
 }
@@ -66,7 +92,21 @@ switch ($_POST["acao"]) {
 
             //redireciona para a págino do formulário
             header("location: novo/index.php");
+
+            exit();
         }
+
+        //pegamos o nome original do arquivo
+        $nomeArquivo = $_FILES["foto"]["name"];
+
+        //extraímos do nome original a extensão
+        $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION); //jpg ou png ou gif ... 
+
+        //geramos um novo nome único utilizando o unix timestamp
+        $novoNomeArquivo = md5(microtime()) . ".$extensao";
+
+        //movemos a foto para a pasta fotos dentro de produtos
+        move_uploaded_file($_FILES["foto"]["tmp_name"], "fotos/$novoNomeArquivo");
 
         //recebemos os valores em variáveis
         $descricao = $_POST["descricao"];
@@ -80,8 +120,8 @@ switch ($_POST["acao"]) {
         $desconto = $_POST["desconto"] != "" ? $_POST["desconto"] : 0;
 
         //declaramos o sql de insert no banco de dados
-        $sqlInsert = " INSERT INTO tbl_produto (descricao, peso, quantidade, cor, tamanho, valor, desconto) 
-                        VALUES ('$descricao', $peso, $quantidade, '$cor', '$tamanho', $valor, $desconto) ";
+        $sqlInsert = " INSERT INTO tbl_produto (descricao, peso, quantidade, cor, tamanho, valor, desconto, imagem) 
+                        VALUES ('$descricao', $peso, $quantidade, '$cor', '$tamanho', $valor, $desconto, '$novoNomeArquivo') ";
 
         echo $sqlInsert;
 

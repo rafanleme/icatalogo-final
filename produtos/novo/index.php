@@ -1,15 +1,13 @@
 <?php
-session_start();
 
-//se o usuário não estiver logado
-if (!isset($_SESSION["usuarioId"])) {
+require("../../database/conexao.php");
 
-  //redireciona para a página de produtos com mensagem de erro
-  $_SESSION["mensagem"] = "Você precisa fazer login para acessar essa página.";
+$sql = " SELECT * FROM tbl_categoria ";
 
-  header("location: ../index.php");
-}
+$resultado = mysqli_query($conexao, $sql);
+
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -22,13 +20,21 @@ if (!isset($_SESSION["usuarioId"])) {
 </head>
 
 <body>
-  <header>
-    <input type="search" placeholder="Pesquisar" />
-  </header>
+  <?php
+  include("../../componentes/header/header.php");
+
+  if (!isset($_SESSION["usuarioId"])) {
+
+    //redireciona para a página de produtos com mensagem de erro
+    $_SESSION["mensagem"] = "Você precisa fazer login para acessar essa página.";
+
+    header("location: ../index.php");
+  }
+  ?>
   <div class="content">
     <section class="produtos-container">
       <main>
-        <form class="form-produto" method="POST" action="../acoes.php">
+        <form class="form-produto" method="POST" action="../acoes.php" enctype="multipart/form-data">
           <input type="hidden" name="acao" value="inserir" />
           <h1>Cadastro de produto</h1>
           <ul>
@@ -73,6 +79,23 @@ if (!isset($_SESSION["usuarioId"])) {
           <div class="input-group">
             <label for="desconto">Desconto</label>
             <input type="text" name="desconto" id="desconto">
+          </div>
+          <div class="input-group">
+            <label for="categoria">Categoria</label>
+            <select id="categoria" name="categoria" required>
+              <option value="">SELECIONE</option>
+              <?php
+              while ($categoria = mysqli_fetch_array($resultado)) {
+              ?>
+                <option value="<?= $categoria["id"] ?>"><?= $categoria["descricao"] ?></option>
+              <?php
+              }
+              ?>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="categoria">Foto</label>
+            <input type="file" name="foto" id="foto" accept="image/*" />
           </div>
           <button onclick="javascript:window.location.href = '../'">Cancelar</button>
           <button>Salvar</button>
