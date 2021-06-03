@@ -70,7 +70,12 @@ function validarCampos()
         if ($width != $height) {
             $erros[] = "A imagem precisa ser quadrada";
         }
-    } 
+    }
+
+    //validar o campo categoria (obrigatório)
+    if (!isset($_POST["categoria"]) || $_POST["categoria"] == "") {
+        $erros[] = "O campo categoria é obrigatório";
+    }
 
     //retorna os erros
     return $erros;
@@ -118,10 +123,13 @@ switch ($_POST["acao"]) {
         $tamanho = $_POST["tamanho"];
         $valor = str_replace(",", ".", $_POST["valor"]);
         $desconto = $_POST["desconto"] != "" ? $_POST["desconto"] : 0;
+        $categoriaId = $_POST["categoria"];
+
+        //salvar o id da categoria no produto
 
         //declaramos o sql de insert no banco de dados
-        $sqlInsert = " INSERT INTO tbl_produto (descricao, peso, quantidade, cor, tamanho, valor, desconto, imagem) 
-                        VALUES ('$descricao', $peso, $quantidade, '$cor', '$tamanho', $valor, $desconto, '$novoNomeArquivo') ";
+        $sqlInsert = " INSERT INTO tbl_produto (descricao, peso, quantidade, cor, tamanho, valor, desconto, imagem, categoria_id) 
+                        VALUES ('$descricao', $peso, $quantidade, '$cor', '$tamanho', $valor, $desconto, '$novoNomeArquivo', $categoriaId) ";
 
         echo $sqlInsert;
 
@@ -135,8 +143,36 @@ switch ($_POST["acao"]) {
             $mensagem = "Erro ao inserir o produto!";
         }
 
+        $_SESSION["mensagem"] = $mensagem;
+
         //redirecionamos para a página de listagem
         header("location: index.php");
 
         break;
+
+    case "deletar":
+
+        $produtoId = $_POST["produtoId"];
+
+        //buscamos o nome da foto do produto no banco de dados
+        $sql = " SELECT imagem FROM tbl_produto WHERE id = $produtoId ";
+        $resultado = mysqli_query($conexao, $sql);
+        $produto = mysqli_fetch_array($resultado);
+
+        //deletamos a imagem da pasta fotos
+        unlink("./fotos/" . $produto["imagem"]);
+
+        //apagamos o produto do banco de dados
+        $sql = " DELETE FROM tbl_produto WHERE id = $produtoId ";
+        $resultado = mysqli_query($conexao, $sql);
+
+        if ($resultado) {
+            $mensagem = "Produto deletado com sucesso.";
+        } else {
+            $mensagem = "Ops, problemas ao excluir, tente novamente.";
+        }
+
+        $_SESSION["mensagem"] = $mensagem;
+
+        header("location: index.php");
 }

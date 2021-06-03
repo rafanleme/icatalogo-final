@@ -2,26 +2,44 @@
 session_start();
 ?>
 <link href="/web-backend-b/icatalogo/componentes/header/header.css" rel="stylesheet" />
-<div class="mensagens">
-    <?php
-
-    if (isset($_SESSION["erros"])) {
-        echo $_SESSION["erros"][0];
-    }
-
-    if (isset($_SESSION["mensagem"])) {
-        echo $_SESSION["mensagem"];
-    }
-
-    unset($_SESSION["erros"]);
+<?php
+if (isset($_SESSION["mensagem"])) {
+?>
+    <div class="mensagens">
+        <?= $_SESSION["mensagem"]; ?>
+    </div>
+    <script lang="javascript">
+        setTimeout(() => {
+            document.querySelector(".mensagens").style.display = "none";
+        }, 4000);
+    </script>
+<?php
     unset($_SESSION["mensagem"]);
-    ?>
+}
+?>
 </div>
 <header class="header">
     <figure>
-        <img src="/web-backend-b/icatalogo/imgs/logo.png" />
+        <a href="/web-backend-b/icatalogo/produtos">
+            <img src="/web-backend-b/icatalogo/imgs/logo.png" />
+        </a>
     </figure>
-    <input type="search" placeholder="Pesquisar" />
+    <form method="GET" action="/web-backend-b/icatalogo/produtos/index.php">
+        <input type="text" value="<?= isset($_GET["p"]) ? $_GET["p"] : "" ?>" id="pesquisar" name="p" placeholder="Pesquisar" />
+        <button <?= isset($_GET["p"]) && $_GET["p"] != "" ? "onClick='limparFiltro()'" : "" ?>>
+            <?php
+            if (isset($_GET["p"]) && $_GET["p"] != "") {
+            ?>
+                <img style="width: 15px" src="/web-backend-b/icatalogo/imgs/close.svg" />
+            <?php
+            } else {
+            ?>
+                <img src="/web-backend-b/icatalogo/imgs/lupa.svg" />
+            <?php
+            }
+            ?>
+        </button>
+    </form>
     <?php
     if (!isset($_SESSION["usuarioId"])) {
     ?>
@@ -78,5 +96,9 @@ session_start();
             containerLogin.style.opacity = 0;
             containerLogin.style.height = "0px";
         }
+    }
+
+    function limparFiltro() {
+        document.querySelector("#pesquisar").value = "";
     }
 </script>
